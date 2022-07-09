@@ -21,8 +21,7 @@ runs:
     - name: Write Packages List
       shell: bash
       run: |
-        echo ${{ inputs.packages }} > /tmp/pi-sysroot-packages.list
-        cat /tmp/pi-sysroot-packages.list
+        echo ${{ inputs.packages }} > _pi_sysroot_packages_${{ github.sha }}.list
     - name: Cache sysroot
       uses: actions/cache@v2
       id: sysroot-cache
@@ -32,9 +31,10 @@ runs:
           ${{ inputs.sysroot }}/lib
           ${{ inputs.sysroot }}/opt
           ${{ inputs.sysroot }}/usr
-        key: ${{ runner.os }}-${{ inputs.release }}-${{ hashFiles('/tmp/pi-sysroot-packages.list') }}
+        key: ${{ runner.os }}-${{ inputs.release }}-${{ hashFiles('_pi_sysroot_packages_*.list') }}
 
     - name: Update packages
+      if: steps.sysroot-cache.outputs.cache-hit != 'true'
       shell: bash
       run: sudo apt-get -yq update || true
 
