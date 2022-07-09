@@ -20,7 +20,9 @@ runs:
   steps:
     - name: Write Packages List
       shell: bash
-      run: echo ${{ inputs.packages }} > /tmp/pi-sysroot-packages.list
+      run: |
+        echo ${{ inputs.packages }} > /tmp/pi-sysroot-packages.list
+        cat /tmp/pi-sysroot-packages.list
     - name: Cache sysroot
       uses: actions/cache@v2
       id: sysroot-cache
