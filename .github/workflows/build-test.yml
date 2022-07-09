@@ -14,4 +14,4 @@ jobs:
       - name: Prepare Sysroot
         uses: ./.github/actions/raspi-sysroot
         with:
-          packages: libraspberrypi-dev
+          packages: libraspberrypi-dev libsdl2-dev
