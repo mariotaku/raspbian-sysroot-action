@@ -1,5 +1,5 @@
-name: "Raspberry Pi Sysroot"
-description: "Prepare Raspberry Pi sysroot"
+name: "Raspbian Sysroot"
+description: "Prepare Raspbian sysroot for cross-compiling"
 
 inputs:
   sysroot:
@@ -7,7 +7,7 @@ inputs:
     default: "/opt/pi-sysroot"
     required: true
   release:
-    description: "Raspbian distro version"
+    description: "Raspbian release"
     default: "bullseye"
     required: true
   packages:
