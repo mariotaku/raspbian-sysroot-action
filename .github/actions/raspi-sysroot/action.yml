@@ -2,13 +2,13 @@ name: "Raspberry Pi Sysroot"
 description: "Prepare Raspberry Pi sysroot"
 
 inputs:
-  version:
-    description: "Raspbian distro version"
-    default: "bullseye"
-    required: true
   sysroot:
     description: "Location of sysroot"
     default: "/opt/pi-sysroot"
+    required: true
+  release:
+    description: "Raspbian distro version"
+    default: "bullseye"
     required: true
   packages:
     description: "Packages to install for sysroot"
@@ -18,6 +18,9 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Write Packages List
+      shell: bash
+      run: echo ${{ inputs.packages }} > /tmp/pi-sysroot-packages.list
     - name: Cache sysroot
       uses: actions/cache@v2
       id: sysroot-cache
@@ -27,7 +30,7 @@ runs:
           ${{ inputs.sysroot }}/lib
           ${{ inputs.sysroot }}/opt
           ${{ inputs.sysroot }}/usr
-        key: ${{ runner.os }}-${{ inputs.version }}-${{ hashFiles('./scripts/raspi/pi-sysroot-setup.sh') }}
+        key: ${{ runner.os }}-${{ inputs.release }}-${{ hashFiles('/tmp/pi-sysroot-packages.list') }}
 
     - name: Update packages
       shell: bash
@@ -38,20 +41,41 @@ runs:
       shell: bash
       env:
         SYSROOT: ${{ inputs.sysroot }}
-        VERSION: ${{ inputs.version }}
+        RELEASE: ${{ inputs.release }}
       run: |
         sudo /bin/bash <<EOF
-          echo sysroot=${SYSROOT}
           apt-get -yq install debootstrap qemu-user-static
           update-binfmts --enable qemu-arm
           mkdir -p ${SYSROOT}
-          debootstrap --arch=armhf --no-check-gpg ${VERSION} ${SYSROOT} http://raspbian.raspberrypi.org/raspbian/
+          debootstrap --arch=armhf --no-check-gpg $RELEASE $SYSROOT http://raspbian.raspberrypi.org/raspbian/
         EOF
 
     - name: Setup Sysroot
       if: steps.sysroot-cache.outputs.cache-hit != 'true'
       shell: bash
+      env:
+        SYSROOT: ${{ inputs.sysroot }}
+        RELEASE: ${{ inputs.release }}
+        PACKAGES: ${{ inputs.packages }}
       run: |
-        sudo chroot ${{ inputs.sysroot }} /bin/bash <<EOF
-            uname -a
+        sudo chroot $SYSROOT /bin/bash <<EOF
+          # Use Google DNS for a consistent name solution
+          echo 'nameserver 8.8.8.8' > /etc/resolv.conf
+          echo 'nameserver 8.8.4.4' >> /etc/resolv.conf
+        
+          # Add archive.raspberrypi.org to APT sources
+          echo "deb http://raspbian.raspberrypi.org/raspbian/ ${RELEASE} main" > /etc/apt/sources.list
+          echo "deb http://archive.raspberrypi.org/debian/ ${RELEASE} main" > /etc/apt/sources.list.d/raspi.list
+        
+          # Trust source from above repositories
+          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
+          
+          # Install dependencies
+          apt-get -yq update
+        
+          # Install symlinks tool
+          apt-get -yq install symlinks $PACKAGES
+        
+          # Convert absolute symlinks to relative symlinks
+          symlinks -cr /usr/lib
         EOF
