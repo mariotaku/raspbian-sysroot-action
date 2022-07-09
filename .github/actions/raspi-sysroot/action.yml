@@ -1,0 +1,57 @@
+name: "Raspberry Pi Sysroot"
+description: "Prepare Raspberry Pi sysroot"
+
+inputs:
+  version:
+    description: "Raspbian distro version"
+    default: "bullseye"
+    required: true
+  sysroot:
+    description: "Location of sysroot"
+    default: "/opt/pi-sysroot"
+    required: true
+  packages:
+    description: "Packages to install for sysroot"
+    default: ""
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache sysroot
+      uses: actions/cache@v2
+      id: sysroot-cache
+      with:
+        path: |
+          ${{ inputs.sysroot }}/bin
+          ${{ inputs.sysroot }}/lib
+          ${{ inputs.sysroot }}/opt
+          ${{ inputs.sysroot }}/usr
+        key: ${{ runner.os }}-${{ inputs.version }}-${{ hashFiles('./scripts/raspi/pi-sysroot-setup.sh') }}
+
+    - name: Update packages
+      shell: bash
+      run: sudo apt-get -yq update || true
+
+    - name: Install Base System
+      if: steps.sysroot-cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        SYSROOT: ${{ inputs.sysroot }}
+        VERSION: ${{ inputs.version }}
+      run: |
+        sudo /bin/bash <<EOF
+          echo sysroot=${SYSROOT}
+          apt-get -yq install debootstrap qemu-user-static
+          update-binfmts --enable qemu-arm
+          mkdir -p ${SYSROOT}
+          debootstrap --arch=armhf --no-check-gpg ${VERSION} ${SYSROOT} http://raspbian.raspberrypi.org/raspbian/
+        EOF
+
+    - name: Setup Sysroot
+      if: steps.sysroot-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        sudo chroot ${{ inputs.sysroot }} /bin/bash <<EOF
+            uname -a
+        EOF

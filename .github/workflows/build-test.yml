@@ -1,0 +1,15 @@
+name: Build Test
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Prepare Sysroot
+        uses: ./.github/actions/raspi-sysroot
