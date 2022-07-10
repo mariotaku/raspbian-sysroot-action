@@ -1,5 +1,5 @@
-name: "Raspbian Sysroot"
-description: "Prepare Raspbian sysroot for cross-compiling"
+name: "Prepare Raspbian Sysroot"
+description: "Prepare a Raspbian sysroot for cross-compiling for Raspberry Pi"
 branding:
   color: purple
   icon: cpu
