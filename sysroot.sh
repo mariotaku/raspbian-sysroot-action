@@ -24,8 +24,8 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
 apt-get -yq update
 
 # Install symlinks tool
-# shellcheck disable=SC2086
-apt-get -yq install symlinks $PACKAGES
+# shellcheck disable=SC2046
+apt-get -yq install symlinks $(echo "$PACKAGES" | tr '\n' ' ')
 
 # Convert absolute symlinks to relative symlinks
 symlinks -cr /usr/lib
