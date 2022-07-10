@@ -66,5 +66,5 @@ runs:
         PACKAGES: ${{ inputs.packages }}
       working-directory: ${{ github.action_path }}
       run: |
-        sudo chroot "$SYSROOT" RELEASE=${{ inputs.release }} PACKAGES="${{ inputs.packages }}" /bin/bash < sysroot.sh
+        sudo RELEASE=${{ inputs.release }} PACKAGES="${{ inputs.packages }}" chroot "$SYSROOT" /bin/bash < sysroot.sh
         sudo cp toolchain.cmake "$SYSROOT"
