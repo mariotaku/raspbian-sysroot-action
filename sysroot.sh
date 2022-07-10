@@ -11,7 +11,7 @@ apt-get -yq update
 
 # Install symlinks tool
 # shellcheck disable=SC2046
-apt-get -yq install symlinks $(echo "$PACKAGES" | tr '\n' ' ')
+apt-get -yq install --no-install-recommends symlinks $(echo "$PACKAGES" | tr '\n' ' ')
 
 # Convert absolute symlinks to relative symlinks
 symlinks -cr /usr/lib
