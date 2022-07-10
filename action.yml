@@ -25,7 +25,7 @@ outputs:
     value: ${{ inputs.sysroot }}
   cmake-toolchain:
     description: "Path to CMake toolchain for cross compiling"
-    value: ${{ steps.set-outputs.outputs.cmake-toolchain }}
+    value: ${{ inputs.sysroot }}/toolchain.cmake
 
 runs:
   using: "composite"
@@ -79,11 +79,3 @@ runs:
       run: |
         sudo PACKAGES="${{ inputs.packages }}" chroot "$SYSROOT" /bin/bash < sysroot.sh
         sed "s|@SYSROOT@|$SYSROOT|" toolchain.cmake | sudo tee "$SYSROOT/toolchain.cmake"
-
-    - name: Set Outputs
-      id: set-outputs
-      shell: bash
-      env:
-        SYSROOT: ${{ inputs.sysroot }}
-      run: |
-        echo "::set-output name=cmake-toolchain::$SYSROOT/toolchain.cmake"
