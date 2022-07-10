@@ -66,9 +66,8 @@ runs:
       shell: bash
       env:
         SYSROOT: ${{ inputs.sysroot }}
-        RELEASE: ${{ inputs.release }}
         PACKAGES: ${{ inputs.packages }}
       working-directory: ${{ github.action_path }}
       run: |
         sudo PACKAGES="${{ inputs.packages }}" chroot "$SYSROOT" /bin/bash < sysroot.sh
-        sudo cp toolchain.cmake "$SYSROOT"
+        sed "s|@SYSROOT@|$SYSROOT|" toolchain.cmake | sudo tee "$SYSROOT/toolchain.cmake"
