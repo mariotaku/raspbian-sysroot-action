@@ -22,10 +22,14 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Package List Hash
-      id: pkglist-hash
+    - name: Generate Hashes
+      id: hashes
       shell: bash
-      run: echo ::set-output name=hash::$(echo "${{ inputs.packages }}" | sha256sum | head -c 64)
+      working-directory: ${{ github.action_path }}
+      run: |
+        echo ::set-output name=packages::$(echo "${{ inputs.packages }}" | sha256sum | head -c 64)
+        echo ::set-output name=basefs::$(sha256sum basefs.sh | head -c 64)
+        echo ::set-output name=sysroot::$(sha256sum sysroot.sh | head -c 64)
 
     - name: Cache Sysroot
       uses: actions/cache@v2
@@ -36,7 +40,7 @@ runs:
           ${{ inputs.sysroot }}/lib
           ${{ inputs.sysroot }}/opt
           ${{ inputs.sysroot }}/usr
-        key: sysroot-${{ inputs.release }}-${{ steps.pkglist-hash.outputs.hash }}
+        key: sysroot-${{ inputs.release }}-${{ steps.hashes.outputs.sysroot }}-${{ steps.hashes.outputs.packages }}
 
     - name: Cache Base Filesystem
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
@@ -44,7 +48,7 @@ runs:
       id: cache-basefs
       with:
         path: ${{ inputs.basefs }}
-        key: basefs-${{ inputs.release }}
+        key: basefs-${{ inputs.release }}-${{ steps.hashes.outputs.basefs }}
 
     - name: Update packages
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
@@ -66,5 +70,5 @@ runs:
         PACKAGES: ${{ inputs.packages }}
       working-directory: ${{ github.action_path }}
       run: |
-        sudo RELEASE=${{ inputs.release }} PACKAGES="${{ inputs.packages }}" chroot "$SYSROOT" /bin/bash < sysroot.sh
+        sudo PACKAGES="${{ inputs.packages }}" chroot "$SYSROOT" /bin/bash < sysroot.sh
         sudo cp toolchain.cmake "$SYSROOT"

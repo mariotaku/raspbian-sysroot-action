@@ -7,19 +7,6 @@ if [ -z "$RELEASE" ] || [ -z "$PACKAGES" ]; then
   exit 1
 fi
 
-# Use Google DNS for a consistent name resolution
-cat <<DNS >/etc/resolv.conf
-nameserver 8.8.8.8
-nameserver 8.8.4.4
-DNS
-
-# Add archive.raspberrypi.org to APT sources
-echo "deb http://raspbian.raspberrypi.org/raspbian/ ${RELEASE} main" >/etc/apt/sources.list
-echo "deb http://archive.raspberrypi.org/debian/ ${RELEASE} main" >/etc/apt/sources.list.d/raspi.list
-
-# Trust source from above repositories
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
-
 # Install dependencies
 apt-get -yq update
 
