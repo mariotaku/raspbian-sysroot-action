@@ -54,13 +54,8 @@ runs:
     - name: Prepare Base System
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
       shell: bash
-      env:
-        SYSROOT: ${{ inputs.sysroot }}
-        RELEASE: ${{ inputs.release }}
-        ARCHIVE: ${{ inputs.basefs }}
-      run: |
-        ls "${{ github.action_path }}"
-        sudo bash "${{ github.action_path }}/basefs.sh"
+      working-directory: ${{ github.action_path }}
+      run: sudo SYSROOT=${{ inputs.sysroot }} RELEASE=${{ inputs.release }} ARCHIVE=${{ inputs.basefs }} bash basefs.sh
 
     - name: Setup Sysroot
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
