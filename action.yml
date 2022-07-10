@@ -14,6 +14,10 @@ inputs:
     description: "Packages to install for sysroot"
     default: ""
     required: false
+  basefs:
+    description: "Path to cached basefs archive"
+    default: /tmp/pi-debootstrap-basefs.tar.gz
+    required: false
 
 runs:
   using: "composite"
@@ -39,7 +43,7 @@ runs:
       uses: actions/cache@v2
       id: cache-basefs
       with:
-        path: /tmp/pi-debootstrap-basefs.tar.gz
+        path: ${{ inputs.basefs }}
         key: basefs-${{ inputs.release }}
 
     - name: Update packages
@@ -53,21 +57,8 @@ runs:
       env:
         SYSROOT: ${{ inputs.sysroot }}
         RELEASE: ${{ inputs.release }}
-        CACHED: ${{ steps.cache-basefs.outputs.cache-hit }}
-      run: |
-        sudo /bin/bash <<EOF
-          apt-get -yq install debootstrap qemu-user-static
-          update-binfmts --enable qemu-arm
-          mkdir -p $SYSROOT
-          if [ $CACHED = 'true' ]; then
-            cd $SYSROOT
-            tar -xzf /tmp/pi-debootstrap-basefs.tar.gz
-          else
-            debootstrap --arch=armhf --no-check-gpg $RELEASE $SYSROOT http://raspbian.raspberrypi.org/raspbian/
-            cd $SYSROOT
-            tar -czf /tmp/pi-debootstrap-basefs.tar.gz .
-          fi
-        EOF
+        ARCHIVE: ${{ inputs.basefs }}
+      run: sudo "${{ github.action_path }}/basefs.sh"
 
     - name: Setup Sysroot
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
@@ -76,25 +67,7 @@ runs:
         SYSROOT: ${{ inputs.sysroot }}
         RELEASE: ${{ inputs.release }}
         PACKAGES: ${{ inputs.packages }}
+      working-directory: ${{ github.action_path }}
       run: |
-        sudo chroot $SYSROOT /bin/bash <<EOF
-          # Use Google DNS for a consistent name resolution
-          echo 'nameserver 8.8.8.8' > /etc/resolv.conf
-          echo 'nameserver 8.8.4.4' >> /etc/resolv.conf
-        
-          # Add archive.raspberrypi.org to APT sources
-          echo "deb http://raspbian.raspberrypi.org/raspbian/ ${RELEASE} main" > /etc/apt/sources.list
-          echo "deb http://archive.raspberrypi.org/debian/ ${RELEASE} main" > /etc/apt/sources.list.d/raspi.list
-        
-          # Trust source from above repositories
-          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
-        
-          # Install dependencies
-          apt-get -yq update
-        
-          # Install symlinks tool
-          apt-get -yq install symlinks $PACKAGES
-        
-          # Convert absolute symlinks to relative symlinks
-          symlinks -cr /usr/lib
-        EOF
+        sudo chroot "$SYSROOT" /bin/bash < sysroot.sh
+        sudo cp toolchain.cmake "$SYSROOT"
