@@ -15,7 +15,7 @@ jobs:
         id: pi-sysroot
         uses: mariotaku/raspbian-sysroot-action@main
         with:
-          packages: libraspberrypi-dev
+          packages: ./packages.list
 
       - name: Print Result
         run: |
