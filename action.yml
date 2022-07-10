@@ -83,6 +83,7 @@ runs:
     - name: Set Outputs
       id: set-outputs
       shell: bash
+      env:
+        SYSROOT: ${{ inputs.sysroot }}
       run: |
-        echo "::set-output name=sysroot::$SYSROOT"
         echo "::set-output name=cmake-toolchain::$SYSROOT/toolchain.cmake"
