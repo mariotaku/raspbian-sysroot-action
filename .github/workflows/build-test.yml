@@ -12,6 +12,6 @@ jobs:
           submodules: recursive
 
       - name: Prepare Sysroot
-        uses: ./
+        uses: mariotaku/raspbian-sysroot-action@main
         with:
           packages: libraspberrypi-dev libsdl2-dev
