@@ -60,7 +60,7 @@ runs:
         ARCHIVE: ${{ inputs.basefs }}
       run: |
         ls "${{ github.action_path }}"
-        sudo "${{ github.action_path }}/basefs.sh"
+        sudo bash "${{ github.action_path }}/basefs.sh"
 
     - name: Setup Sysroot
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
