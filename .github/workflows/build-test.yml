@@ -12,8 +12,12 @@ jobs:
           submodules: recursive
 
       - name: Prepare Sysroot
+        id: pi-sysroot
         uses: mariotaku/raspbian-sysroot-action@main
         with:
-          packages: |
-            libraspberrypi-dev
-            libsdl2-dev
+          packages: libraspberrypi-dev
+
+      - name: Print Result
+        run: |
+          echo Sysroot Path: ${{ steps.pi-sysroot.outputs.sysroot }}
+          echo CMake Toolchain File: ${{ steps.pi-sysroot.outputs.cmake-toolchain }}

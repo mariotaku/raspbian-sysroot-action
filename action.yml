@@ -19,6 +19,14 @@ inputs:
     default: /tmp/pi-debootstrap-basefs.tar.gz
     required: false
 
+outputs:
+  sysroot:
+    description: "Location of sysroot"
+    value: ${{ inputs.sysroot }}
+  cmake-toolchain:
+    description: "Path to CMake toolchain for cross compiling"
+    value: ${{ steps.set-outputs.outputs.cmake-toolchain }}
+
 runs:
   using: "composite"
   steps:
@@ -71,3 +79,10 @@ runs:
       run: |
         sudo PACKAGES="${{ inputs.packages }}" chroot "$SYSROOT" /bin/bash < sysroot.sh
         sed "s|@SYSROOT@|$SYSROOT|" toolchain.cmake | sudo tee "$SYSROOT/toolchain.cmake"
+
+    - name: Set Outputs
+      id: set-outputs
+      shell: bash
+      run: |
+        echo "::set-output name=sysroot::$SYSROOT"
+        echo "::set-output name=cmake-toolchain::$SYSROOT/toolchain.cmake"
