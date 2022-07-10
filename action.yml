@@ -22,10 +22,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Write Packages List
+    - name: Package List Hash
+      id: pkglist-hash
       shell: bash
-      run: |
-        echo ${{ inputs.packages }} > _pi_sysroot_packages_${{ github.sha }}.list
+      run: echo ::set-output name=hash::$(echo "${{ inputs.packages }}" | sha256sum | head -c 64)
 
     - name: Cache Sysroot
       uses: actions/cache@v2
@@ -36,7 +36,7 @@ runs:
           ${{ inputs.sysroot }}/lib
           ${{ inputs.sysroot }}/opt
           ${{ inputs.sysroot }}/usr
-        key: sysroot-${{ inputs.release }}-${{ hashFiles('_pi_sysroot_packages_*.list') }}
+        key: sysroot-${{ inputs.release }}-${{ steps.pkglist-hash.outputs.hash }}
 
     - name: Cache Base Filesystem
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
