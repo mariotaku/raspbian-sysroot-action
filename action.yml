@@ -11,7 +11,7 @@ inputs:
     default: "bullseye"
     required: true
   packages:
-    description: "Packages to install for sysroot"
+    description: "Packages to install for sysroot, can be a string or path to packages list"
     default: ""
     required: false
   basefs:
