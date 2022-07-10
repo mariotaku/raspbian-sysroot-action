@@ -1,5 +1,8 @@
 name: "Raspbian Sysroot"
 description: "Prepare Raspbian sysroot for cross-compiling"
+branding:
+  color: purple
+  icon: cpu
 
 inputs:
   sysroot:
