@@ -22,6 +22,11 @@ jobs:
         id: pi-sysroot
         uses: mariotaku/raspbian-sysroot-action@main
 
+      - name: Install Build Tools
+        shell: bash
+        # apt-get update was implicitly called, so we don't have to call it here
+        run: sudo apt-get -y -qq install crossbuild-essential-armhf cmake
+
       - name: Build Project
         working-directory: mbedtls
         run: |
