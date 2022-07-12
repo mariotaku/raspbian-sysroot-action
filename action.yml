@@ -44,6 +44,7 @@ runs:
         echo ::set-output name=packages::$(echo "${{ inputs.packages }}" | sha256sum | head -c 64)
         echo ::set-output name=basefs::$(sha256sum basefs.sh | head -c 64)
         echo ::set-output name=sysroot::$(sha256sum sysroot.sh | head -c 64)
+        echo ::set-output name=scripts::$(sha256sum scripts.sh | head -c 64)
 
     - name: Cache Sysroot
       uses: actions/cache@v3
@@ -54,7 +55,7 @@ runs:
           ${{ inputs.sysroot }}/lib
           ${{ inputs.sysroot }}/opt
           ${{ inputs.sysroot }}/usr
-        key: sysroot-${{ inputs.release }}-${{ steps.hashes.outputs.sysroot }}-${{ steps.hashes.outputs.packages }}
+        key: sysroot-${{ inputs.release }}-${{ steps.hashes.outputs.sysroot }}-${{ steps.hashes.outputs.packages }}-${{ steps.hashes.outputs.scripts }}
 
     - name: Cache Base Filesystem
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
@@ -88,7 +89,4 @@ runs:
           PACKAGES=$(cat "$PACKAGES")
         fi
         sudo PACKAGES="$PACKAGES" chroot "$SYSROOT" /bin/bash < sysroot.sh
-        echo "Saving toolchain.cmake"
-        sed "s|@SYSROOT@|$SYSROOT|" toolchain.cmake | sudo tee "$SYSROOT/toolchain.cmake"
-        echo "Saving envsetup.sh"
-        sed "s|@SYSROOT@|$SYSROOT|" envsetup.sh | sudo tee "$SYSROOT/envsetup.sh"
+        sudo SYSROOT="$SYSROOT" ./scripts.sh
