@@ -89,4 +89,4 @@ runs:
           PACKAGES=$(cat "$PACKAGES")
         fi
         sudo PACKAGES="$PACKAGES" chroot "$SYSROOT" /bin/bash < sysroot.sh
-        sudo SYSROOT="$SYSROOT" ./scripts.sh
+        sudo SYSROOT="$SYSROOT" bash scripts.sh
