@@ -29,6 +29,9 @@ outputs:
   cmake-toolchain:
     description: "Path to CMake toolchain for cross compiling"
     value: ${{ inputs.sysroot }}/toolchain.cmake
+  shell-envsetup:
+    description: "Path to envsetup script for cross compiling"
+    value: ${{ inputs.sysroot }}/shell-envsetup
 
 runs:
   using: "composite"
@@ -85,4 +88,7 @@ runs:
           PACKAGES=$(cat "$PACKAGES")
         fi
         sudo PACKAGES="$PACKAGES" chroot "$SYSROOT" /bin/bash < sysroot.sh
+        echo "Saving toolchain.cmake"
         sed "s|@SYSROOT@|$SYSROOT|" toolchain.cmake | sudo tee "$SYSROOT/toolchain.cmake"
+        echo "Saving envsetup.sh"
+        sed "s|@SYSROOT@|$SYSROOT|" envsetup.sh | sudo tee "$SYSROOT/envsetup.sh"
