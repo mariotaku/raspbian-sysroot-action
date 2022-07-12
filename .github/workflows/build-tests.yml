@@ -1,0 +1,31 @@
+name: Build Test
+
+on: push
+
+jobs:
+  build-mbedtls:
+    name: CMake Project Example (MbedTLS)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - uses: actions/checkout@v3
+        with:
+          repository: Mbed-TLS/mbedtls
+          ref: v3.2.0
+          path: mbedtls
+
+      - name: Prepare Sysroot
+        id: pi-sysroot
+        uses: mariotaku/raspbian-sysroot-action@main
+
+      - name: Build Project
+        working-directory: mbedtls
+        run: |
+          cmake -E make_directory build
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=${{steps.pi-sysroot.outputs.cmake-toolchain}}
+          cmake --build .
