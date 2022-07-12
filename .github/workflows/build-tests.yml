@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: Mbed-TLS/mbedtls
-          ref: v3.2.0
+          ref: v2.28.1
           path: mbedtls
 
       - name: Prepare Sysroot
