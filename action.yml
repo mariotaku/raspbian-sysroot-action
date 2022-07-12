@@ -31,7 +31,7 @@ outputs:
     value: ${{ inputs.sysroot }}/toolchain.cmake
   shell-envsetup:
     description: "Path to envsetup script for cross compiling"
-    value: ${{ inputs.sysroot }}/shell-envsetup
+    value: ${{ inputs.sysroot }}/envsetup.sh
 
 runs:
   using: "composite"
