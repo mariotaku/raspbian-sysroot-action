@@ -89,4 +89,10 @@ runs:
           PACKAGES=$(cat "$PACKAGES")
         fi
         sudo PACKAGES="$PACKAGES" chroot "$SYSROOT" /bin/bash < sysroot.sh
-        sudo SYSROOT="$SYSROOT" bash scripts.sh
+
+    - name: Install Scripts
+      shell: bash
+      env:
+        SYSROOT: ${{ inputs.sysroot }}
+      working-directory: ${{ github.action_path }}
+      run: sudo SYSROOT="$SYSROOT" bash scripts.sh
