@@ -39,9 +39,15 @@ runs:
     - name: Generate Hashes
       id: hashes
       shell: bash
+      env:
+        PACKAGES: ${{ inputs.packages }}
       working-directory: ${{ github.action_path }}
       run: |
-        echo "packages=$(echo "${{ inputs.packages }}" | sha256sum | head -c 64)" >> $GITHUB_OUTPUT
+        # Read packages into variable if it's a file
+        if [ -f "${{ inputs.packages }}" ]; then
+          PACKAGES=$(cat "$PACKAGES")
+        fi
+        echo "packages=$(echo "$PACKAGES" | sha256sum | head -c 64)" >> $GITHUB_OUTPUT
         echo "basefs=$(sha256sum basefs.sh | head -c 64)" >> $GITHUB_OUTPUT
         echo "sysroot=$(sha256sum sysroot.sh | head -c 64)" >> $GITHUB_OUTPUT
         echo "scripts=$(sha256sum scripts.sh | head -c 64)" >> $GITHUB_OUTPUT
