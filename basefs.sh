@@ -29,6 +29,8 @@ wget "$DEBIAN_PUBKEY" -qO- | gpg --import --no-default-keyring --keyring "$DEBIA
 debootstrap --arch=armhf --keyring="$DEBIAN_KEYRING" "$RELEASE" "$SYSROOT" "$MIRROR"
 cd "$SYSROOT" || exit 1
 
+mkdir -p ./etc/apt/sources.list.d/
+
 # Add archive.raspberrypi.org to APT sources
 echo "deb http://archive.raspberrypi.org/debian/ $RELEASE main" >./etc/apt/sources.list.d/raspi.list
 
