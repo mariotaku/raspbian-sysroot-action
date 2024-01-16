@@ -107,7 +107,7 @@ jobs:
         run: sudo apt-get -y -qq install crossbuild-essential-armhf cmake
 
       - name: Build Project
-        working-directory: qtbase
+        working-directory: hello
         run: |
           cmake -E make_directory build
           cd build
