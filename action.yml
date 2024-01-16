@@ -11,7 +11,7 @@ inputs:
     required: true
   release:
     description: "Raspbian release"
-    default: "bullseye"
+    default: "bookworm"
     required: true
   packages:
     description: "Packages to install for sysroot, can be a string or path to packages list"

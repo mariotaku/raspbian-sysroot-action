@@ -5,7 +5,7 @@ on: push
 jobs:
   build-mbedtls:
     name: CMake Project Example (MbedTLS)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
 
   build-opus:
     name: Autoconf Project Example (opus)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
@@ -73,7 +73,7 @@ jobs:
 
   build-qt-cmake:
     name: Qt CMake Project Example (Hello World)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
