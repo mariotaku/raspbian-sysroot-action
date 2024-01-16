@@ -8,11 +8,11 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: Mbed-TLS/mbedtls
           ref: v2.28.1
@@ -36,15 +36,15 @@ jobs:
           cmake --build .
 
   build-opus:
-    name: CMake Project Example (Autoconf)
+    name: Autoconf Project Example (opus)
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: xiph/opus
           ref: v1.3.1
@@ -70,3 +70,46 @@ jobs:
           ./autogen.sh
           ./configure --host=arm-linux-gnueabihf
           make
+
+  build-qt-cmake:
+    name: Qt CMake Project Example (Hello World)
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/checkout@v4
+        with:
+          repository: jasondegraw/Qt-CMake-HelloWorld
+          ref: e699662a408098b4d89ea66e99185717c7a6aa85
+          path: hello
+
+      - name: Prepare Sysroot
+        id: pi-sysroot
+        uses: mariotaku/raspbian-sysroot-action@main
+        with:
+          packages: |
+            qtbase5-dev
+
+      - name: Qt5 Tools Hack
+        shell: bash
+        run: |
+          sudo rm -f ${SYSROOT}/usr/lib/qt5/bin
+          sudo ln -s /usr/lib/qt5/bin ${SYSROOT}/usr/lib/qt5/bin
+        env:
+          SYSROOT: ${{steps.pi-sysroot.outputs.sysroot}}
+
+      - name: Install Build Tools
+        shell: bash
+        # apt-get update was implicitly called, so we don't have to call it here
+        run: sudo apt-get -y -qq install crossbuild-essential-armhf cmake
+
+      - name: Build Project
+        working-directory: qtbase
+        run: |
+          cmake -E make_directory build
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=${{steps.pi-sysroot.outputs.cmake-toolchain}}
+          cmake --build .
