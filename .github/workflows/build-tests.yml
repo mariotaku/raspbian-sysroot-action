@@ -96,7 +96,7 @@ jobs:
       - name: Qt5 Tools Hack
         shell: bash
         run: |
-          sudo rm -f ${SYSROOT}/usr/lib/qt5/bin
+          sudo rm -rf ${SYSROOT}/usr/lib/qt5/bin
           sudo ln -s /usr/lib/qt5/bin ${SYSROOT}/usr/lib/qt5/bin
         env:
           SYSROOT: ${{steps.pi-sysroot.outputs.sysroot}}
