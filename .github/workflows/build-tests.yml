@@ -104,7 +104,7 @@ jobs:
       - name: Install Build Tools
         shell: bash
         # apt-get update was implicitly called, so we don't have to call it here
-        run: sudo apt-get -y -qq install crossbuild-essential-armhf cmake
+        run: sudo apt-get -y -qq install crossbuild-essential-armhf cmake qtbase5-dev-tools
 
       - name: Build Project
         working-directory: hello
