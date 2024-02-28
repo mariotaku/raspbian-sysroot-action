@@ -53,7 +53,7 @@ runs:
         echo "scripts=$(sha256sum scripts.sh | head -c 64)" >> $GITHUB_OUTPUT
 
     - name: Cache Sysroot
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: cache-sysroot
       with:
         path: |
@@ -65,7 +65,7 @@ runs:
 
     - name: Cache Base Filesystem
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: cache-basefs
       with:
         path: ${{ inputs.basefs }}
