@@ -13,6 +13,10 @@ inputs:
     description: "Raspbian release"
     default: "bookworm"
     required: true
+  arch:
+    description: "Raspbian architecture"
+    default: "armhf"
+    required: true
   packages:
     description: "Packages to install for sysroot, can be a string or path to packages list"
     default: ""
@@ -61,7 +65,7 @@ runs:
           ${{ inputs.sysroot }}/lib
           ${{ inputs.sysroot }}/opt
           ${{ inputs.sysroot }}/usr
-        key: sysroot-${{ inputs.release }}-${{ steps.hashes.outputs.sysroot }}-${{ steps.hashes.outputs.packages }}-${{ steps.hashes.outputs.scripts }}
+        key: sysroot-${{ inputs.release }}-${{ inputs.arch }}-${{ steps.hashes.outputs.sysroot }}-${{ steps.hashes.outputs.packages }}-${{ steps.hashes.outputs.scripts }}
 
     - name: Cache Base Filesystem
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
@@ -69,7 +73,7 @@ runs:
       id: cache-basefs
       with:
         path: ${{ inputs.basefs }}
-        key: basefs-${{ inputs.release }}-${{ steps.hashes.outputs.basefs }}
+        key: basefs-${{ inputs.release }}-${{ inputs.arch }}-${{ steps.hashes.outputs.basefs }}
 
     - name: Update packages
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
@@ -80,7 +84,7 @@ runs:
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
       shell: bash
       working-directory: ${{ github.action_path }}
-      run: sudo SYSROOT=${{ inputs.sysroot }} RELEASE=${{ inputs.release }} ARCHIVE=${{ inputs.basefs }} bash basefs.sh
+      run: sudo ARCH=${{ inputs.arch }} SYSROOT=${{ inputs.sysroot }} RELEASE=${{ inputs.release }} ARCHIVE=${{ inputs.basefs }} bash basefs.sh
 
     - name: Setup Sysroot
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
@@ -101,4 +105,4 @@ runs:
       env:
         SYSROOT: ${{ inputs.sysroot }}
       working-directory: ${{ github.action_path }}
-      run: sudo SYSROOT="$SYSROOT" bash scripts.sh
+      run: sudo ARCH=${{ inputs.arch }} SYSROOT="$SYSROOT" bash scripts.sh

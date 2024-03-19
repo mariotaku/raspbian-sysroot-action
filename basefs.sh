@@ -26,7 +26,7 @@ DEBIAN_PUBKEY="https://archive.raspbian.org/raspbian.public.key"
 DEBIAN_KEYRING="/tmp/raspbian_keyring.gpg"
 
 wget "$DEBIAN_PUBKEY" -qO- | gpg --import --no-default-keyring --keyring "$DEBIAN_KEYRING"
-debootstrap --arch=armhf --keyring="$DEBIAN_KEYRING" "$RELEASE" "$SYSROOT" "$MIRROR"
+debootstrap --arch="$ARCH" --keyring="$DEBIAN_KEYRING" "$RELEASE" "$SYSROOT" "$MIRROR"
 cd "$SYSROOT" || exit 1
 
 mkdir -p ./etc/apt/sources.list.d/

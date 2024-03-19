@@ -1,8 +1,8 @@
 set(CMAKE_SYSROOT "@SYSROOT@")
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc)
-set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
-set(CMAKE_LIBRARY_ARCHITECTURE arm-linux-gnueabihf)
+set(CMAKE_C_COMPILER "@TARGET_TRIPLE@-gcc")
+set(CMAKE_CXX_COMPILER "@TARGET_TRIPLE@-g++")
+set(CMAKE_LIBRARY_ARCHITECTURE "@TARGET_TRIPLE@")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,-rpath-link,${CMAKE_SYSROOT}/opt/vc/lib")
 set(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})
@@ -16,15 +16,15 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
 set(CMAKE_SYSTEM_LIBRARY_PATH
-    "${CMAKE_SYSROOT}/lib/arm-linux-gnueabihf"
+    "${CMAKE_SYSROOT}/lib/@TARGET_TRIPLE@"
     "${CMAKE_SYSROOT}/lib"
-    "${CMAKE_SYSROOT}/usr/lib/arm-linux-gnueabihf"
+    "${CMAKE_SYSROOT}/usr/lib/@TARGET_TRIPLE@"
     "${CMAKE_SYSROOT}/usr/lib/"
     "${CMAKE_SYSROOT}/opt/vc/lib"
 )
 
 set(PKG_CONFIG_LIBDIR_LIST
-    "${CMAKE_SYSROOT}/usr/lib/arm-linux-gnueabihf/pkgconfig"
+    "${CMAKE_SYSROOT}/usr/lib/@TARGET_TRIPLE@/pkgconfig"
     "${CMAKE_SYSROOT}/usr/lib/pkgconfig"
     "${CMAKE_SYSROOT}/usr/share/pkgconfig"
     "${CMAKE_SYSROOT}/opt/vc/lib/pkgconfig"

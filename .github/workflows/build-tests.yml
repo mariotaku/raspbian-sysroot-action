@@ -6,6 +6,9 @@ jobs:
   build-mbedtls:
     name: CMake Project Example (MbedTLS)
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        arch: [ armhf, arm64 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -21,11 +24,13 @@ jobs:
       - name: Prepare Sysroot
         id: pi-sysroot
         uses: mariotaku/raspbian-sysroot-action@main
+        with:
+          arch: ${{ matrix.arch }}
 
       - name: Install Build Tools
         shell: bash
         # apt-get update was implicitly called, so we don't have to call it here
-        run: sudo apt-get -y -qq install crossbuild-essential-armhf cmake
+        run: sudo apt-get -y -qq install crossbuild-essential-${{ matrix.arch }} cmake
 
       - name: Build Project
         working-directory: mbedtls
@@ -38,6 +43,14 @@ jobs:
   build-opus:
     name: Autoconf Project Example (opus)
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - arch: armhf
+            triple: arm-linux-gnueabihf
+          - arch: arm64
+            triple: aarch64-linux-gnu
+
 
     steps:
       - uses: actions/checkout@v4
@@ -53,27 +66,32 @@ jobs:
       - name: Prepare Sysroot
         id: pi-sysroot
         uses: mariotaku/raspbian-sysroot-action@main
+        with:
+          arch: ${{ matrix.arch }}
 
       - name: Install Build Tools
         shell: bash
         # apt-get update was implicitly called, so we don't have to call it here
-        run: sudo apt-get -y -qq install crossbuild-essential-armhf
+        run: sudo apt-get -y -qq install crossbuild-essential-${{ matrix.arch }}
 
       - name: Build Project
         working-directory: opus
         env:
-          CC: arm-linux-gnueabihf-gcc
-          CXX: arm-linux-gnueabihf-g++
-          LD: arm-linux-gnueabihf-ld
+          CC: ${{ matrix.triple }}-gcc
+          CXX: ${{ matrix.triple }}-g++
+          LD: ${{ matrix.triple }}-ld
         run: |
           source ${{steps.pi-sysroot.outputs.shell-envsetup}}
           ./autogen.sh
-          ./configure --host=arm-linux-gnueabihf
+          ./configure --host=${{ matrix.triple }}
           make
 
   build-qt-cmake:
     name: Qt CMake Project Example (Hello World)
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        arch: [ armhf, arm64 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -90,6 +108,7 @@ jobs:
         id: pi-sysroot
         uses: mariotaku/raspbian-sysroot-action@main
         with:
+          arch: ${{ matrix.arch }}
           packages: |
             qtbase5-dev
 
@@ -104,7 +123,7 @@ jobs:
       - name: Install Build Tools
         shell: bash
         # apt-get update was implicitly called, so we don't have to call it here
-        run: sudo apt-get -y -qq install crossbuild-essential-armhf cmake qtbase5-dev-tools
+        run: sudo apt-get -y -qq install crossbuild-essential-${{ matrix.arch }} cmake qtbase5-dev-tools
 
       - name: Build Project
         working-directory: hello
