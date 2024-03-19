@@ -84,7 +84,7 @@ runs:
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
       shell: bash
       working-directory: ${{ github.action_path }}
-      run: sudo ARCH=${{ inputs.arch }} SYSROOT=${{ inputs.sysroot }} RELEASE=${{ inputs.release }} ARCHIVE=${{ inputs.basefs }} bash basefs.sh
+      run: sudo ARCH=${{ inputs.arch }} SYSROOT=${{ inputs.sysroot }} RELEASE=${{ inputs.release }} ARCHIVE=${{ inputs.basefs }} bash -x basefs.sh
 
     - name: Setup Sysroot
       if: steps.cache-sysroot.outputs.cache-hit != 'true'
@@ -98,11 +98,11 @@ runs:
         if [ -f "$PACKAGES" ]; then
           PACKAGES=$(cat "$PACKAGES")
         fi
-        sudo PACKAGES="$PACKAGES" chroot "$SYSROOT" /bin/bash < sysroot.sh
+        sudo PACKAGES="$PACKAGES" chroot "$SYSROOT" /bin/bash -x < sysroot.sh
 
     - name: Install Scripts
       shell: bash
       env:
         SYSROOT: ${{ inputs.sysroot }}
       working-directory: ${{ github.action_path }}
-      run: sudo ARCH=${{ inputs.arch }} SYSROOT="$SYSROOT" bash scripts.sh
+      run: sudo ARCH=${{ inputs.arch }} SYSROOT="$SYSROOT" bash -x scripts.sh

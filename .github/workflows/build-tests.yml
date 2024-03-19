@@ -16,7 +16,8 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: actions/checkout@v4
+      - name: Checkout MbedTLS
+        uses: actions/checkout@v4
         with:
           repository: Mbed-TLS/mbedtls
           ref: v2.28.1
@@ -59,7 +60,8 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: actions/checkout@v4
+      - name: Checkout Opus
+        uses: actions/checkout@v4
         with:
           repository: xiph/opus
           ref: v1.3.1
@@ -101,7 +103,8 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: actions/checkout@v4
+      - name: Checkout Qt-CMake-HelloWorld
+        uses: actions/checkout@v4
         with:
           repository: jasondegraw/Qt-CMake-HelloWorld
           ref: e699662a408098b4d89ea66e99185717c7a6aa85
