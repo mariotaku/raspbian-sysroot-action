@@ -4,9 +4,10 @@ on: push
 
 jobs:
   build-mbedtls:
-    name: CMake Project Example (MbedTLS)
+    name: CMake Project Example (MbedTLS, ${{ matrix.arch }})
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         arch: [ armhf, arm64 ]
 
@@ -41,9 +42,10 @@ jobs:
           cmake --build .
 
   build-opus:
-    name: Autoconf Project Example (opus)
+    name: Autoconf Project Example (opus, ${{ matrix.arch }})
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         include:
           - arch: armhf
@@ -87,9 +89,10 @@ jobs:
           make
 
   build-qt-cmake:
-    name: Qt CMake Project Example (Hello World)
+    name: Qt CMake Project Example (Hello World, ${{ matrix.arch }})
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         arch: [ armhf, arm64 ]
 

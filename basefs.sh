@@ -9,7 +9,18 @@ fi
 
 apt-get -yq install qemu-user-static
 
-update-binfmts --enable qemu-arm
+case "$ARCH" in
+armhf)
+  update-binfmts --enable qemu-arm
+  ;;
+arm64)
+  update-binfmts --enable qemu-aarch64
+  ;;
+*)
+  echo "Unsupported architecture: $ARCH"
+  exit 1
+  ;;
+esac
 
 mkdir -p "$SYSROOT"
 
