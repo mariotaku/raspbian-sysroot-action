@@ -11,10 +11,16 @@ apt-get -yq install qemu-user-static
 
 case "$ARCH" in
 armhf)
-  update-binfmts --enable qemu-arm
+  update-binfmts --enable qemu-arm || exit 1
+  DEBIAN_PUBKEY="https://archive.raspbian.org/raspbian.public.key"
+  DEBIAN_KEYRING="/tmp/raspbian_keyring.gpg"
+
+  wget "$DEBIAN_PUBKEY" -qO- | gpg --import --no-default-keyring --keyring "$DEBIAN_KEYRING" || exit 1
+  KEYRING_OPT="--keyring=$DEBIAN_KEYRING"
+  MIRROR="http://raspbian.raspberrypi.org/raspbian/"
   ;;
 arm64)
-  update-binfmts --enable qemu-aarch64
+  update-binfmts --enable qemu-aarch64 || exit 1
   MIRROR="http://deb.debian.org/debian/"
   ;;
 *)
@@ -31,20 +37,12 @@ if [ -n "$ARCHIVE" ] && [ -f "$ARCHIVE" ]; then
   exit 0
 fi
 
-apt-get -yq install debootstrap
+apt-get -yq install debootstrap || exit 1
 
-if [ -z "$MIRROR" ]; then
-  MIRROR="http://raspbian.raspberrypi.org/raspbian/"
-fi
-
-DEBIAN_PUBKEY="https://archive.raspbian.org/raspbian.public.key"
-DEBIAN_KEYRING="/tmp/raspbian_keyring.gpg"
-
-wget "$DEBIAN_PUBKEY" -qO- | gpg --import --no-default-keyring --keyring "$DEBIAN_KEYRING"
-debootstrap --arch="$ARCH" --keyring="$DEBIAN_KEYRING" "$RELEASE" "$SYSROOT" "$MIRROR"
+debootstrap --arch="$ARCH" $KEYRING_OPT "$RELEASE" "$SYSROOT" "$MIRROR" || exit 1
 cd "$SYSROOT" || exit 1
 
-mkdir -p ./etc/apt/sources.list.d/
+mkdir -p ./etc/apt/sources.list.d/ || exit 1
 
 # Add archive.raspberrypi.org to APT sources
 echo "deb http://archive.raspberrypi.org/debian/ $RELEASE main" >./etc/apt/sources.list.d/raspi.list
