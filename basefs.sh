@@ -15,6 +15,7 @@ armhf)
   ;;
 arm64)
   update-binfmts --enable qemu-aarch64
+  MIRROR="http://deb.debian.org/debian/"
   ;;
 *)
   echo "Unsupported architecture: $ARCH"
@@ -32,7 +33,10 @@ fi
 
 apt-get -yq install debootstrap
 
-MIRROR="http://raspbian.raspberrypi.org/raspbian/"
+if [ -z "$MIRROR" ]; then
+  MIRROR="http://raspbian.raspberrypi.org/raspbian/"
+fi
+
 DEBIAN_PUBKEY="https://archive.raspbian.org/raspbian.public.key"
 DEBIAN_KEYRING="/tmp/raspbian_keyring.gpg"
 
